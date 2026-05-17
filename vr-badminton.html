@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VR Badminton — CMSC498F</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #000000;
+    --ink: #ffffff;
+    --muted: #888888;
+    --accent: #c8522a;
+    --rule: #2a2a2a;
+    --col: 680px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'DM Mono', monospace;
+    font-weight: 300;
+    font-size: 14px;
+    line-height: 1.8;
+    min-height: 100vh;
+  }
+
+  /* ── Header ── */
+  header {
+    border-bottom: 1px solid var(--rule);
+    padding: 3rem 2rem 2.5rem;
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: end;
+    gap: 2rem;
+  }
+
+  .title-block h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2.8rem, 6vw, 5rem);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+
+  .title-block h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .title-block .subtitle {
+    margin-top: 0.75rem;
+    color: var(--muted);
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .tag {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border: 1px solid var(--rule);
+    padding: 0.4rem 0.8rem;
+    white-space: nowrap;
+    align-self: start;
+  }
+
+  /* ── Nav ── */
+  nav {
+    border-bottom: 1px solid var(--rule);
+    padding: 0 2rem;
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+  }
+
+  nav a {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    padding: 1rem 1.5rem 1rem 0;
+    transition: color 0.2s;
+    white-space: nowrap;
+  }
+
+  nav a:first-child { padding-left: 0; }
+  nav a:hover { color: var(--ink); }
+
+  /* ── Main layout ── */
+  main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 2rem 6rem;
+  }
+
+  section {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 3rem;
+    padding: 3.5rem 0;
+    border-bottom: 1px solid var(--rule);
+    opacity: 0;
+    transform: translateY(16px);
+    animation: fadeUp 0.6s ease forwards;
+  }
+
+  section:nth-child(1) { animation-delay: 0.05s; }
+  section:nth-child(2) { animation-delay: 0.15s; }
+  section:nth-child(3) { animation-delay: 0.25s; }
+  section:nth-child(4) { animation-delay: 0.35s; }
+  section:nth-child(5) { animation-delay: 0.45s; }
+  section:nth-child(6) { animation-delay: 0.55s; }
+  section:nth-child(7) { animation-delay: 0.65s; }
+
+  @keyframes fadeUp {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .section-label {
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding-top: 0.2rem;
+    position: relative;
+  }
+
+  .section-label::before {
+    content: '—';
+    display: block;
+    color: var(--accent);
+    margin-bottom: 0.5rem;
+  }
+
+  .section-body p {
+    color: var(--ink);
+    margin-bottom: 1.2rem;
+    font-size: 14px;
+    line-height: 1.85;
+  }
+
+  .section-body p:last-child { margin-bottom: 0; }
+
+  /* ── List items ── */
+  .item-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .item-list li {
+    display: flex;
+    gap: 1rem;
+    align-items: baseline;
+    font-size: 14px;
+  }
+
+  .item-list li::before {
+    content: '↳';
+    color: var(--accent);
+    flex-shrink: 0;
+    font-size: 12px;
+  }
+
+  /* ── Accomplishments ── */
+  .accomplish-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .accomplish-item {
+    border-left: 2px solid var(--rule);
+    padding-left: 1.2rem;
+    transition: border-color 0.2s;
+  }
+
+  .accomplish-item:hover {
+    border-color: var(--accent);
+  }
+
+  .accomplish-item .who {
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.3rem;
+  }
+
+  .accomplish-item p {
+    font-size: 13.5px;
+    line-height: 1.8;
+    color: var(--ink);
+  }
+
+  /* ── Results / Shortcomings chips ── */
+  .chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .chip {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    padding: 0.35rem 0.8rem;
+    border: 1px solid var(--rule);
+    color: var(--muted);
+  }
+
+  .chip.accent {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* ── Footer ── */
+  footer {
+    border-top: 1px solid var(--rule);
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  footer span {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 640px) {
+    header { grid-template-columns: 1fr; }
+    .tag { display: none; }
+
+    section {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+      padding: 2.5rem 0;
+    }
+
+    .section-label {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .section-label::before {
+      display: inline;
+      margin-bottom: 0;
+    }
+
+    nav a { padding: 0.8rem 1rem 0.8rem 0; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="title-block">
+    <h1>VR <em>Badminton</em></h1>
+    <p class="subtitle">CMSC498F Final Project &nbsp;·&nbsp; University of Maryland</p>
+  </div>
+  <div class="tag">Virtual Reality</div>
+</header>
+
+<nav>
+  <a href="#about">About</a>
+  <a href="#background">Background</a>
+  <a href="#techniques">Techniques</a>
+  <a href="#accomplishments">Accomplishments</a>
+  <a href="#results">Results</a>
+  <a href="#shortcomings">Shortcomings</a>
+  <a href="#future">Future Work</a>
+</nav>
+
+<main>
+
+  <section id="about">
+    <div class="section-label">About</div>
+    <div class="section-body">
+      <p>We wanted a realistic VR badminton simulator that could be played among friends without the need for real equipment or a court. We wanted to make it as realistic as possible using accurate rules, physics, and playing conditions.</p>
+    </div>
+  </section>
+
+  <section id="background">
+    <div class="section-label">Background</div>
+    <div class="section-body">
+      <ul class="item-list">
+        <li>A friend came to UMD to play badminton but was denied entry due to the service desk being closed.</li>
+        <li>Difficulty accessing facilities to play sports that require large spaces and extra equipment.</li>
+        <li>Due to Covid, at-home exercise has greatly increased over the past few years, creating a large market demand.</li>
+        <li>A new generation of adults growing up with a nostalgia for movement-tracking games such as Wii Sports and Wii Sports Resort.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="techniques">
+    <div class="section-label">Techniques &amp; Approaches</div>
+    <div class="section-body">
+      <ul class="item-list">
+        <li>Used scientific papers — including <em>The Physics of Badminton</em> by C. Cohen et al. — to obtain accurate measurements of how badminton birdies interact.</li>
+        <li>Employed the Unity particle system to replicate weather and impact-based birdie movement.</li>
+        <li>Used the Meta XR Building Blocks to track hands and hand-grabbing, tying different grabbing actions to distinct purposes.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="accomplishments">
+    <div class="section-label">Accomplishments</div>
+    <div class="section-body">
+      <div class="accomplish-grid">
+        <div class="accomplish-item">
+          <div class="who">Nathan</div>
+          <p>Created realistic weather conditions that dynamically impact birdie movement.</p>
+        </div>
+        <div class="accomplish-item">
+          <div class="who">Joseph</div>
+          <p>Implemented accurate physics for the badminton birdie, grounded in peer-reviewed research.</p>
+        </div>
+        <div class="accomplish-item">
+          <div class="who">Court Logic</div>
+          <p>The court accurately counts scores, manages game states, automatically switches serving sides, keeps score across multi-match games, and enforces serving faults — with and without a redo option.</p>
+        </div>
+        <div class="accomplish-item">
+          <div class="who">Zone Detection</div>
+          <p>BirdieZoneTrigger uses colliders placed across the court with a serialized enum variable unique to each zone, giving the GameManager the exact zone the birdie landed in for serve validation. A special NetTrigger uses two colliders to detect both net contact and net clearance, ensuring all scored hits legitimately crossed the net.</p>
+        </div>
+        <div class="accomplish-item">
+          <div class="who">Player Tracking</div>
+          <p>BirdieZoneTrigger components double as player position tracking, working alongside a PlayerIdentity script that identifies which side the human player is on. Only objects tagged Shuttlecock and Player can trigger these zones.</p>
+        </div>
+        <div class="accomplish-item">
+          <div class="who">Game Manager</div>
+          <p>Enforces game states and serving sides consistent with real badminton rules, tracks score per game and across matches, and allows the player to configure match count and fault rules. Physical invisible walls surround the court, containing birdies inside and players to their respective sides.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="results">
+    <div class="section-label">Results</div>
+    <div class="section-body">
+      <div class="chip-row">
+        <span class="chip accent">CMSC498F Final Project Proposal</span>
+      </div>
+      <p>The project produced a working framework encompassing court logic, physics simulation, weather effects, and hand-tracking integration — establishing a solid foundation for a fully playable VR badminton experience.</p>
+    </div>
+  </section>
+
+  <section id="shortcomings">
+    <div class="section-label">Shortcomings</div>
+    <div class="section-body">
+      <ul class="item-list">
+        <li><strong>Missing core interaction:</strong> Birdie and racket interactions remained unreliable. After several attempts using various methods, the racket could never consistently hit the birdie, which also limited racket variety.</li>
+        <li><strong>Feature integration:</strong> The team never combined all individual components into a single unified scene.</li>
+        <li><strong>Lack of gameplay:</strong> No game modes or functional AI agents were completed in time.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="future">
+    <div class="section-label">Future Work</div>
+    <div class="section-body">
+      <p>Both team members worked on individual parts of the project but were unfortunately unable to combine them in time. Future goals include completing the remaining base mechanics, adding more game modes, expanding equipment and environmental variety, and improving overall user immersion.</p>
+      <p>Finishing the AI opponent is also a priority, enabling players to have actual competitive games within the simulation.</p>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <span>VR Badminton &nbsp;·&nbsp; CMSC498F</span>
+  <span>University of Maryland</span>
+</footer>
+
+</body>
+</html>
